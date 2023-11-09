@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "jupyter-example"
+version = "0.1.0"
+description = ""
+authors = ["mrmamongo <mrmamongo@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.104.1"
+jupyter-client = {extras = ["ipykernel"], version = "^8.6.0"}
+pydantic = "^2.4.2"
+pyzmq = "^25.1.1"
+anyio = "^3"
+ipykernel = "^6.26.0"
+uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
+aiohttp = "^3.8.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

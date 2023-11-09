@@ -1,0 +1,17 @@
+POST http://localhost:44565/execute
+Content-Type: application/json
+
+{
+    "sourceId": "JOPA",
+    "code_cells": "print('a')"
+}
+
+###
+
+POST http://localhost:44565/execute
+Content-Type: application/json
+
+{
+    "sourceId": "JOPA",
+    "code_cells": "print('jopa')"
+}

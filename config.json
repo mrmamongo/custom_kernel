@@ -1,0 +1,22 @@
+{
+  "stream": {
+    "sender_port": 44567,
+    "notifier_port": 44568
+  },
+  "api": {
+    "client_port": 44565,
+    "server_port": 44566
+  },
+  "jupyter": {
+    "shell_port": 43257,
+    "iopub_port": 50107,
+    "stdin_port": 51975,
+    "control_port": 59583,
+    "hb_port": 39981,
+    "ip": "127.0.0.1",
+    "key": "742564b3-f0f134c49f1d1e0fc140d272",
+    "transport": "tcp",
+    "signature_scheme": "hmac-sha256",
+    "kernel_name": "python3"
+  }
+}
