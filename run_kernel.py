@@ -21,9 +21,10 @@ async def main():
     config = get_config()
 
     app.get('/kernel_info')(get_kernel_info)
-    kernel_session = Session(key=config.jupyter.key.encode(), username="mrmamongo")
-    kernel = AsyncKernelManager(session=kernel_session, **config.jupyter.model_dump())
-    cl = AsyncKernelClient(session=kernel_session, **config.jupyter.model_dump())
+    # kernel_session = Session(key=config.jupyter.key.encode(), username="mrmamongo")
+    kernel = AsyncKernelManager(**config.jupyter.model_dump(), cache_ports=False)
+    await kernel.start_kernel()
+    cl = kernel.client(**config.jupyter.model_dump())
     cl.start_channels()
     await cl.wait_for_ready()
     app.state.kernel_info = lambda: kernel.get_connection_info()

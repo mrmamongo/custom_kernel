@@ -6,6 +6,11 @@ html = """
     </head>
     <body>
         <h1>WebSocket Chat</h1>
+        <form method="post" action="http://localhost:44565/execute">
+            <input type="text" name="sourceId">
+            <input type="text" name="codeCells">
+            <button type="submit">Submit</button>
+        </form>
         <ul id='messages'>
         </ul>
         <script>
@@ -16,6 +21,7 @@ html = """
                 var content = document.createTextNode(event.data)
                 message.appendChild(content)
                 messages.appendChild(message)
+                console.log(content)
             };
         </script>
     </body>

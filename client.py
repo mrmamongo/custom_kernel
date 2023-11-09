@@ -4,7 +4,6 @@ import asyncio
 import logging
 import os
 import queue
-from asyncio import sleep
 
 import aiohttp
 import uvicorn
@@ -16,10 +15,11 @@ from jupyter_client.session import Session
 from config import Config, JupyterConfig, get_config
 from src.application.executor_service.service import ExecutorService
 from src.application.executor_service.setup import setup_executor_service
+from src.application.stream_adapter.dto import StreamMessage
 from src.presentation.fastapi.setup import setup_fastapi
 from src.presentation.kernel_listener.handlers import control_handler, stdin_handler, \
     shell_handler, IopubHandler
-from src.presentation.kernel_listener.listener import KernelListener, SocketType
+from src.presentation.kernel_listener.listener import KernelListener, SocketType, Message
 from src.presentation.kernel_listener.setup import setup_kernel_listener
 
 logger = logging.getLogger(__name__)
@@ -29,15 +29,13 @@ class App:
     def __init__(self, app: FastAPI, executor_service: ExecutorService, kernel_listener: KernelListener,
                  config: Config,
                  kernel_manager: AsyncKernelManager,
-                 kernel_client: AsyncKernelClient,
-                 zmq_context: zmq.Context) -> None:
+                 kernel_client: AsyncKernelClient) -> None:
         self.app = app
         self.executor_service = executor_service
         self.kernel_listener = kernel_listener
         self.config = config
         self.kernel_manager = kernel_manager
         self.kernel_client = kernel_client
-        self.zmq_context = zmq_context
 
     @classmethod
     async def from_config(cls, config: Config) -> App:
@@ -52,8 +50,8 @@ class App:
         logger.info(config.jupyter)
         app = setup_fastapi(config.api)
         app.state.stream_config = lambda: config.stream
-        zmq_context = zmq.Context()
-        app.state.zmq_context = lambda: zmq_context
+        mq = queue.Queue[StreamMessage]()
+        app.state.queue = lambda: mq
 
         kernel_session = Session(key=config.jupyter.key.encode(), username="mrmamongo")
         kernel_manager = AsyncKernelManager(session=kernel_session, **config.jupyter.model_dump())
@@ -65,6 +63,7 @@ class App:
         app.state.executor_service = lambda: executor_service
 
         kernel_listener = setup_kernel_listener(kernel_client.blocking_client())
+        kernel_listener.state.queue = lambda: mq
         kernel_listener.state.config = lambda: config.stream
 
         kernel_listener.register_handler(SocketType.iopub_channel, IopubHandler)
@@ -80,7 +79,7 @@ class App:
             config=config,
             kernel_manager=kernel_manager,
             kernel_client=kernel_client,
-            zmq_context=zmq_context
+            # zmq_context=zmq_context
         )
 
     async def start(self) -> None:

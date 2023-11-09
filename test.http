@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
     "sourceId": "JOPA",
-    "code_cells": "print('a')"
+    "codeCells": "print('a')"
 }
 
 ###
@@ -13,5 +13,5 @@ Content-Type: application/json
 
 {
     "sourceId": "JOPA",
-    "code_cells": "print('jopa')"
+    "codeCells": "print('jopa')"
 }

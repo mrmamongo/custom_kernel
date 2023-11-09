@@ -83,7 +83,7 @@ class KernelListener(StoppableThread):
             return
         if inspect.isclass(handler):
             def wrapper(message: Message) -> None:
-                handler(message.state.config())(message)
+                handler(message.state)(message)
 
             self.sockets[socket_type].handlers.append(StubHandler(target=wrapper))
         if inspect.isfunction(handler):

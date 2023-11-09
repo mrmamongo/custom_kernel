@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -20,16 +21,13 @@ router = APIRouter()
 
 class ExecuteCodeModel(BaseModel):
     source_id: str = Field(alias="sourceId")
-    code_cells: str
+    code_cells: str = Field(alias="codeCells")
 
 
 @router.post("/execute")
-def execute_code(data: ExecuteCodeModel,
-                       executor_service: Annotated[ExecutorService, Depends(executor_service_scope)]):
-    task = Task(
-        source_id=data.source_id,
-        code_blocks=[CodeBlock(block_id="1", code=data.code_cells, language=Languages.PYTHON)]
-    )
+def execute_code(data: ExecuteCodeModel, executor_service: Annotated[ExecutorService, Depends(executor_service_scope)]):
+    task = Task(source_id=data.source_id,
+                code_blocks=[CodeBlock(block_id="1", code=data.code_cells, language=Languages.PYTHON)])
     executor_service.execute_code(task)
 
 
@@ -41,10 +39,11 @@ async def get_websocket():
 @router.websocket("/ws")
 async def streaming_data(websocket: WebSocket, stream_adapter: Annotated[StreamAdapter, Depends(stream_adapter_scope)]):
     await websocket.accept()
-    await asyncio.to_thread(stream_adapter.init)
-    with stream_adapter:
+    loop = asyncio.get_event_loop()
+    with ThreadPoolExecutor() as exec:
         while True:
-            message = await asyncio.to_thread(stream_adapter.recv)
+            logging.error("Streaming data")
+            message = await loop.run_in_executor(func=stream_adapter.recv, executor=exec)
             logging.error(stream_adapter)
             logging.error(message.model_dump_json())
             await websocket.send_text(message.model_dump_json())
