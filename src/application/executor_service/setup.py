@@ -7,7 +7,7 @@ from src.application.executor.service import Executor
 from src.application.executor.state import ExecutorState
 from src.application.executor_service.service import ExecutorService
 from src.application.ijulia_adapter.interfaces import IJuliaAdapter
-from src.infra.jupyter_client.engee_jupyter_client import EngeeKernelClient
+from src.infra.jupyter_client.engee_kernel_client import EngeeKernelClient
 from src.infra.jupyter_client.ijulia_adapter import JCIJuliaAdapter
 
 

@@ -8,7 +8,7 @@ from src.application.executor.commands import BaseCommand, ExecuteCommand, Stdin
 from src.application.executor.service import Executor
 from src.application.executor_service.dto import Task
 from src.infra.common.thread import StoppableThread
-from src.infra.jupyter_client.engee_jupyter_client import EngeeKernelClient
+from src.infra.jupyter_client.engee_kernel_client import EngeeKernelClient
 
 
 class ExecutorService:

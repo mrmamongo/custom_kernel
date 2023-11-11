@@ -9,24 +9,17 @@ import aiohttp
 import uvicorn
 import zmq
 from fastapi import FastAPI
-from jupyter_client import AsyncKernelClient, AsyncKernelManager
-from jupyter_client.session import Session, SessionFactory
+from jupyter_client import AsyncKernelClient
+from jupyter_client.session import SessionFactory
 
 from config import Config, JupyterConfig, get_config
 from src.application.executor_service.service import ExecutorService
 from src.application.executor_service.setup import setup_executor_service
 from src.application.stream_adapter.dto import StreamMessage
-from src.infra.jupyter_client.engee_jupyter_client import EngeeKernelClient
+from src.infra.jupyter_client.engee_kernel_client import EngeeKernelClient
 from src.presentation.fastapi.setup import setup_fastapi
-from src.presentation.kernel_listener.handlers import (
-    IopubHandler,
-    control_handler,
-    shell_handler,
-    stdin_handler,
-)
 from src.presentation.kernel_listener.listener import (
     KernelListener,
-    SocketType,
 )
 from src.presentation.kernel_listener.setup import setup_kernel_listener
 
