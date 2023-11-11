@@ -3,7 +3,7 @@ import logging
 
 import uvicorn
 from fastapi import FastAPI
-from jupyter_client import AsyncKernelManager, AsyncKernelClient
+from jupyter_client import AsyncKernelClient, AsyncKernelManager
 from jupyter_client.session import Session
 from starlette.requests import Request
 
@@ -20,7 +20,7 @@ async def main():
     app = FastAPI()
     config = get_config()
 
-    app.get('/kernel_info')(get_kernel_info)
+    app.get("/kernel_info")(get_kernel_info)
     # kernel_session = Session(key=config.jupyter.key.encode(), username="mrmamongo")
     kernel = AsyncKernelManager(**config.jupyter.model_dump(), cache_ports=False)
     await kernel.start_kernel()
@@ -40,5 +40,5 @@ async def main():
     await server.serve()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

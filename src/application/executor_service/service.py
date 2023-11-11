@@ -7,11 +7,8 @@ from uuid import UUID
 import anyio
 from jupyter_client import KernelManager
 
-from src.application.executor.commands import (
-    BaseCommand,
-    ExecuteCommand,
-    StdinCommand,
-)
+from src.application.executor.commands import (BaseCommand, ExecuteCommand,
+                                               StdinCommand)
 from src.application.executor.service import Executor
 from src.application.executor_service.dto import Task
 from src.infra.common.thread import StoppableThread

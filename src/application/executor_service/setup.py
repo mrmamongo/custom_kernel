@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from jupyter_client import AsyncKernelManager, AsyncKernelClient
+from jupyter_client import AsyncKernelClient, AsyncKernelManager
 
 from src.application.executor.commands import ExecuteCommand
 from src.application.executor.handlers import execute_code
@@ -11,7 +11,7 @@ from src.infra.jupyter_client.ijulia_adapter import JCIJuliaAdapter
 
 
 def setup_executor_service(
-        kernel_client: AsyncKernelClient, kernel_manager: AsyncKernelManager
+    kernel_client: AsyncKernelClient, kernel_manager: AsyncKernelManager
 ) -> ExecutorService:
     state = ExecutorState()
     executor = Executor(state)

@@ -1,6 +1,6 @@
 import functools
 import inspect
-from typing import Any, Callable, Generator, Iterator, Type, TypeVar, Coroutine
+from typing import Any, Callable, Coroutine, Generator, Iterator, Type, TypeVar
 
 from src.application.executor.commands import BaseCommand
 from src.application.executor.state import ExecutorState
@@ -8,10 +8,10 @@ from src.application.executor.state import ExecutorState
 TDependency = TypeVar("TDependency")
 
 DependencyType = (
-        TDependency
-        | Callable[[Any], TDependency]
-        | Generator[TDependency, None, None]
-        | Iterator[TDependency]
+    TDependency
+    | Callable[[Any], TDependency]
+    | Generator[TDependency, None, None]
+    | Iterator[TDependency]
 )
 
 
@@ -23,7 +23,7 @@ class Executor:
         self.register_dependency(ExecutorState, self.state)
 
     def register_dependency(
-            self, interface: Type, dependency: Any, cache: bool = False
+        self, interface: Type, dependency: Any, cache: bool = False
     ) -> None:
         if isinstance(dependency, interface):
             self.dependencies[interface] = lambda: dependency
@@ -40,6 +40,7 @@ class Executor:
                 return dependency(**deps)
 
             if cache:
+
                 def cached_generator(d: Generator):
                     _result = [None]
 
@@ -67,8 +68,9 @@ class Executor:
                 self.dependencies[interface] = dependency
             return
 
-    def register_handler(self, command_type: Type[BaseCommand], handler: Callable) -> \
-            Callable[[BaseCommand], Coroutine]:
+    def register_handler(
+        self, command_type: Type[BaseCommand], handler: Callable
+    ) -> Callable[[BaseCommand], Coroutine]:
         dependencies = inspect.signature(handler)
         accept_command = False
         accepted_dependencies = {}
@@ -86,12 +88,13 @@ class Executor:
 
         async def wrapped(command: command_type) -> None:
             if inspect.iscoroutinefunction(handler):
-                return await handler(command, **{
-                key: dep() for key, dep in accepted_dependencies.items()
-            })
-            return handler(command, **{
-                key: dep() for key, dep in accepted_dependencies.items()
-            })
+                return await handler(
+                    command,
+                    **{key: dep() for key, dep in accepted_dependencies.items()},
+                )
+            return handler(
+                command, **{key: dep() for key, dep in accepted_dependencies.items()}
+            )
 
         self.handlers[command_type] = wrapped
         return wrapped

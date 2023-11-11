@@ -1,5 +1,4 @@
 import queue
-from typing import Callable
 
 import zmq
 
@@ -7,7 +6,13 @@ from src.application.stream_adapter.dto import StreamMessage
 
 
 class ZMQSender:
-    def __init__(self, sender_port: int, notifier_port: int, *, context: zmq.Context | None = None):
+    def __init__(
+        self,
+        sender_port: int,
+        notifier_port: int,
+        *,
+        context: zmq.Context | None = None,
+    ):
         self.context = context or zmq.Context.instance()
         self.sender_socket: zmq.Socket = self.context.socket(zmq.PUB)
         self.sender_socket.bind(f"tcp://127.0.0.1:{sender_port}")
@@ -32,8 +37,8 @@ class ZMQSender:
 
 
 class InmemorySender:
-    def __init__(self, mq: Callable[[], queue.Queue[StreamMessage]]):
-        self.mq = mq()
+    def __init__(self, mq: queue.Queue[StreamMessage]):
+        self.mq = mq
 
     def send(self, message: dict) -> None:
         self.mq.put(StreamMessage(data=message))

@@ -1,4 +1,4 @@
-from jupyter_client import AsyncKernelManager, AsyncKernelClient, KernelClient, BlockingKernelClient
+from jupyter_client import (BlockingKernelClient)
 
 from src.presentation.kernel_listener.listener import KernelListener
 

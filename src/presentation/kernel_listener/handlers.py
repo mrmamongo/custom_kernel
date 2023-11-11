@@ -4,8 +4,9 @@ from typing import Any
 from starlette.datastructures import State
 
 from config import StreamHandlerConfig
-from src.presentation.kernel_listener.listener import Message, Handler
-from src.presentation.kernel_listener.zmq_sender import ZMQSender, InmemorySender
+from src.presentation.kernel_listener.listener import Handler, Message
+from src.presentation.kernel_listener.zmq_sender import (InmemorySender,
+                                                         ZMQSender)
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +20,13 @@ class IopubHandler(Handler):
         self.state = state
 
     def __call__(self, message: Message) -> None:
-        match message.message['msg_type']:
+        match message.message["msg_type"]:
             case "status":
-                print(f"STATUS {message.message['content']}")
+                logger.info(f"STATUS {message.message['content']}")
             case "execute_input":
-                print(f"EXEC_INP {message.message['content']}")
+                logger.info(f"EXEC_INP {message.message['content']}")
             case "stream":
-                InmemorySender(self.state.queue).send(message.message['content'])
+                InmemorySender(self.state.queue()).send(message.message["content"])
 
 
 def stdin_handler(message: Message) -> None:

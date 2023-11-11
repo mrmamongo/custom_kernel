@@ -6,10 +6,10 @@ class StoppableThread(threading.Thread):
     """Convenience class for creating stoppable threads."""
 
     def __init__(
-            self,
-            target: Callable[[], None] | None = None,
-            kwargs: Mapping[str, Any] | None = None,
-            stopped_event: threading.Event | None = None,
+        self,
+        target: Callable[[], None] | None = None,
+        kwargs: Mapping[str, Any] | None = None,
+        stopped_event: threading.Event | None = None,
     ):
         super().__init__(target=target, kwargs=kwargs)
         self.__stopped_event = stopped_event or threading.Event()

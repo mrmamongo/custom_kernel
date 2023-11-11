@@ -8,5 +8,5 @@ logger = logging.getLogger(__name__)
 
 async def execute_code(data: ExecuteCommand, adapter: IJuliaAdapter):
     logger.info(f"Sending data to execution... {data.source_id} {data.block.code}")
-    msg = adapter.execute_code(data.block.code, data.source_id)
+    msg = await adapter.execute_code(data.block.code, data.source_id)
     logger.info(f"Sent: {msg}")
