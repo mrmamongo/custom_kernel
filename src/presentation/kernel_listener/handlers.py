@@ -1,12 +1,9 @@
 import logging
-from typing import Any
 
 from starlette.datastructures import State
 
-from config import StreamHandlerConfig
 from src.presentation.kernel_listener.listener import Handler, Message
-from src.presentation.kernel_listener.zmq_sender import (InmemorySender,
-                                                         ZMQSender)
+from src.presentation.kernel_listener.zmq_sender import InmemorySender
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +23,12 @@ class IopubHandler(Handler):
             case "execute_input":
                 logger.info(f"EXEC_INP {message.message['content']}")
             case "stream":
-                InmemorySender(self.state.queue()).send(message.message["content"])
+                logger.info(f"STREAM {message.message['content']}")
+        InmemorySender(self.state.queue()).send(message.message["content"])
 
 
 def stdin_handler(message: Message) -> None:
-    logger.info(message, extra={"channel": "stdin"})
+    InmemorySender(self.state.queue()).send(message.message["content"])
 
 
 def control_handler(message: Message) -> None:

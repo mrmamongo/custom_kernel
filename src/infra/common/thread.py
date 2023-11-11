@@ -10,8 +10,9 @@ class StoppableThread(threading.Thread):
         target: Callable[[], None] | None = None,
         kwargs: Mapping[str, Any] | None = None,
         stopped_event: threading.Event | None = None,
+            daemon: bool = False,
     ):
-        super().__init__(target=target, kwargs=kwargs)
+        super().__init__(target=target, kwargs=kwargs, daemon=daemon)
         self.__stopped_event = stopped_event or threading.Event()
 
     @property

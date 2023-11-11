@@ -1,12 +1,15 @@
+import asyncio
 import inspect
 import logging
+import threading
 from abc import ABC, abstractmethod
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Callable, NamedTuple
+from typing import Any, Callable
 
 import zmq
-from jupyter_client import BlockingKernelClient
+from jupyter_client import AsyncKernelClient, BlockingKernelClient
 from jupyter_client.channels import ZMQSocketChannel
 from starlette.datastructures import State
 
@@ -47,26 +50,16 @@ class StubHandler(Handler):
 
 
 class KernelListener(StoppableThread):
-    def __init__(self, kernel_client: BlockingKernelClient) -> None:
+    def __init__(self, kernel_client: AsyncKernelClient) -> None:
         self.state = State()
-        self.kernel_client = kernel_client
-        self.sockets = {
-            SocketType.shell_channel: SocketWrapper(
-                socket=self.kernel_client.shell_channel, handlers=[]
-            ),
-            SocketType.iopub_channel: SocketWrapper(
-                socket=self.kernel_client.iopub_channel, handlers=[]
-            ),
-            SocketType.stdin_channel: SocketWrapper(
-                socket=self.kernel_client.stdin_channel, handlers=[]
-            ),
-            SocketType.control_channel: SocketWrapper(
-                socket=self.kernel_client.control_channel, handlers=[]
-            ),
-        }
+        logging.error(kernel_client)
+        self.sockets = {SocketType.shell_channel: SocketWrapper(socket=kernel_client.shell_channel, handlers=[]),
+                        SocketType.iopub_channel: SocketWrapper(socket=kernel_client.iopub_channel, handlers=[]),
+                        SocketType.stdin_channel: SocketWrapper(socket=kernel_client.stdin_channel, handlers=[]),
+                        SocketType.control_channel: SocketWrapper(socket=kernel_client.control_channel, handlers=[]), }
         self.poller = zmq.Poller()
 
-        super().__init__()
+        super().__init__(daemon=True)
 
     def register_handler(self, socket_type: SocketType, handler: Callable | Handler):
         """
@@ -82,7 +75,6 @@ class KernelListener(StoppableThread):
             self.sockets[socket_type].handlers.append(handler)
             return
         if inspect.isclass(handler):
-
             def wrapper(message: Message) -> None:
                 handler(message.state)(message)
 
@@ -95,12 +87,15 @@ class KernelListener(StoppableThread):
         for key, sock in self.sockets.items():
             self.poller.register(sock.socket.socket)
 
-    def run(self):
+    def run(self) -> None:
+        asyncio.run(self.run_())
+
+    async def run_(self) -> None:
         while True:
-            socks = dict(self.poller.poll())
-            for wrapper in self.sockets.values():
-                if socks.get(wrapper.socket.socket) == zmq.POLLIN:
-                    message = wrapper.socket.get_msg()
+            self.poller.poll()
+            for socket_type, wrapper in self.sockets.items():
+                if await wrapper.socket.msg_ready():
+                    message = await wrapper.socket.get_msg()
                     for handler in wrapper.handlers:
                         handler(Message(state=self.state, message=message))
 

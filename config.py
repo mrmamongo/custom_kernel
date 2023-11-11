@@ -1,5 +1,6 @@
 import json
 from functools import cache
+from pathlib import Path
 
 from pydantic import BaseModel
 
@@ -20,7 +21,7 @@ class JupyterConfig(BaseModel):
 class APIConfig(BaseModel):
     client_port: int = 44556
     server_port: int = 44557
-
+    templates_dir: Path = "./templates"
 
 class StreamHandlerConfig(BaseModel):
     sender_port: int = 55655

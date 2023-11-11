@@ -36,7 +36,6 @@ class Executor:
                 deps = {}
                 for key, dep in deps_signature.items():
                     deps[key] = self.dependencies[dependency.annotation]
-                print(deps)
                 return dependency(**deps)
 
             if cache:

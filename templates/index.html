@@ -1,0 +1,61 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+        <h1>Jupyter Client</h1>
+        <label>
+            <textarea rows="10" cols="20" id="codeCell"></textarea>
+        </label>
+        <button id="executeCode">Execute</button>
+        <button id="interrupt">Interrupt</button>
+
+        <label id="stdin_text">
+            <input type='text' id="stdin"/>
+        </label>
+        <button id="sendStdin">Send Stdin</button>
+        <ul id='messages'>
+        </ul>
+        <script>
+            const ws = new WebSocket("{{ url_for('streaming_data') }}");
+            ws.onmessage = function(event) {
+                const messages = document.getElementById('messages')
+                const message = document.createElement('li')
+                const content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+
+            };
+            const codeCell = document.getElementById('codeCell')
+            document.getElementById("executeCode").onclick = (event) =>  {
+                fetch("{{url_for('execute_code')}}", {
+                    method: "POST",
+                    body: JSON.stringify({sourceId: "scratch", codeCells: codeCell.value}),
+                    headers: {"Content-Type": "application/json", "Accept": "application/json"}
+                })
+            }
+            document.getElementById("interrupt").onclick = () => {
+                fetch("{{ url_for('interrupt') }}", {
+                    method: "POST"
+                })
+            }
+            const stdin = document.getElementById("stdin")
+            document.getElementById("sendStdin").onclick = () => {
+                fetch("{{ url_for('send_stdin') }}", {
+                    method: "POST",
+                    body: JSON.stringify({sourceId: "scratch", stdinData: stdin.value}),
+                    headers: {"Content-Type": "application/json", "Accept": "application/json"}
+                })
+            }
+        </script>
+</body>
+</html>

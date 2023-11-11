@@ -9,5 +9,4 @@ class InmemoryStreamAdapter(StreamAdapter):
         self.messages = mq
 
     def recv(self) -> StreamMessage:
-        print(self.messages)
         return self.messages.get()
